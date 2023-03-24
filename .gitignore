@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# druge
+.idea
+inputi_za_login.txt
+Skrivni_podatki.py
+test.py
