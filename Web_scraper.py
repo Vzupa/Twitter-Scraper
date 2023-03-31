@@ -12,7 +12,7 @@ from datetime import datetime
 import Skrivni_podatki
 
 
-spanje_cas = 10
+spanje_cas = 5
 
 
 def remove_invalid_characters(s):
@@ -86,6 +86,7 @@ if __name__ == '__main__':
     last_postion = driver.execute_script("return window.pageYOffset;")
     scrolling = True
     index = 0
+    pixels = 0
 
     try:
         while scrolling:
@@ -100,7 +101,7 @@ if __name__ == '__main__':
                 if not podatki:
                     continue
 
-                tweet_id = ''.join(podatki)
+                tweet_id = podatki[2]
                 if tweet_id not in tweet_ids:
                     tweet_ids.add(tweet_id)
                     tweet_data.append(podatki)
@@ -111,8 +112,11 @@ if __name__ == '__main__':
             scroll_attempt = 0
             while True:
                 sleep(spanje_cas)
-                driver.execute_script('window.scrollTo(0, document.body.scrollHeight / 2);')
+                pixels += 1000
+                driver.execute_script(f'window.scrollTo(0, {pixels});')
                 current_position = driver.execute_script("return window.pageYOffset;")
+                print("current position: ", str(current_position) + " last position: ", str(last_postion))
+
                 if last_postion == current_position:
                     scroll_attempt += 1
 
@@ -130,10 +134,12 @@ if __name__ == '__main__':
     finally:
         tweet_data = sorted(tweet_data, key=lambda x: x[2], reverse=True)
 
-        if len(tweet_data) > 30:
+        pogoj = input("Zelis shranit? (y/n): ")
+
+        if len(tweet_data) > 1 and pogoj == "y":
+            print("Shranjujem...")
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
-            file_name = f"{Skrivni_podatki.handle}_{timestamp}.csv"
-            file_name = "csv_output/" + remove_invalid_characters(file_name)
+            file_name = f"csv_output/{Skrivni_podatki.handle}_{timestamp}.csv"
 
             with open(file_name, 'w', newline='', encoding='utf-8') as f:
                 header = ['Uporabnisko ime', 'Handle', 'Cas', 'Body', 'Retweet', 'Reply', 'Likes']
