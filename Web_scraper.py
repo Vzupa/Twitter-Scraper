@@ -15,6 +15,17 @@ import Skrivni_podatki
 spanje_cas = 5
 
 
+def check_string_format(input_str):
+    # Vcasih v tistem glavnem delu tweeta samo 3-je deli namesto 4-ih. S tem odstranim like,share, retweete iz bodi-ja
+    allowed_chars = set('0123456789./KM,\n')
+    if set(input_str) - allowed_chars:
+        return True
+    for val in input_str.split('\n'):
+        if not val.endswith(('K', 'M', "1", "2", "3", "4", "5", "6", "6", "7", "8", "9", "0")) or not val[:-1].replace('.', '').replace(',', '', 1).isdigit():
+            return True
+    return False
+
+
 def remove_invalid_characters(s):
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
     return ''.join(c for c in s if c in valid_chars)
@@ -35,7 +46,10 @@ def preberiCard(card):
 
     body_prvi = card.find_element(By.XPATH, Skrivni_podatki.do_druge_cetrine).text
     body_drugi = card.find_element(By.XPATH, f"{Skrivni_podatki.do_cetrtine}/div[3]").text
-    body = body_prvi + " " + body_drugi
+    if check_string_format(body_drugi):
+        body = body_prvi + " " + body_drugi
+    else:
+        body = body_prvi
 
     if body == " ":
         return
@@ -112,7 +126,7 @@ if __name__ == '__main__':
             scroll_attempt = 0
             while True:
                 sleep(spanje_cas)
-                pixels += 1000
+                pixels += 2000
                 driver.execute_script(f'window.scrollTo(0, {pixels});')
                 current_position = driver.execute_script("return window.pageYOffset;")
                 print("current position: ", str(current_position) + " last position: ", str(last_postion))
@@ -125,7 +139,7 @@ if __name__ == '__main__':
                         break
                     else:
                         print(f"scroll attempt: {scroll_attempt}")
-                        sleep(spanje_cas)
+                        sleep(spanje_cas * 2)
                 else:
                     last_postion = current_position
                     break
@@ -136,12 +150,12 @@ if __name__ == '__main__':
 
         pogoj = input("Zelis shranit? (y/n): ")
 
-        if len(tweet_data) > 1 and pogoj == "y":
+        if pogoj == "y":
             print("Shranjujem...")
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
             file_name = f"csv_output/{Skrivni_podatki.handle}_{timestamp}.csv"
 
-            with open(file_name, 'w', newline='', encoding='utf-8') as f:
+            with open(file_name, 'w', newline='', encoding='utf-8-sig') as f:
                 header = ['Uporabnisko ime', 'Handle', 'Cas', 'Body', 'Retweet', 'Reply', 'Likes']
                 writer = csv.writer(f)
                 writer.writerow(header)
