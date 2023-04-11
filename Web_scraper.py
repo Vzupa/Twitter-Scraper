@@ -155,11 +155,12 @@ if __name__ == '__main__':
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
             file_name = f"csv_output/{Skrivni_podatki.handle}_{timestamp}.csv"
 
-            with open(file_name, 'w', newline='', encoding='utf-8-sig') as f:
+            with open(file_name, 'w', newline='', encoding='utf-8') as f:
                 header = ['Uporabnisko ime', 'Handle', 'Cas', 'Body', 'Retweet', 'Reply', 'Likes']
                 writer = csv.writer(f)
                 writer.writerow(header)
                 writer.writerows(tweet_data)
+                print("shranjeno")
 
     print("konec")
     try:
