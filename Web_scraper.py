@@ -120,7 +120,10 @@ if __name__ == '__main__':
                     tweet_ids.add(tweet_id)
                     tweet_data.append(podatki)
                     print(index, end =" ")
-                    print(podatki)
+                    try:
+                        print(podatki)
+                    except Exception as e:
+                        print("Napaka pri printanju")
                     index += 1
 
             scroll_attempt = 0
@@ -146,6 +149,7 @@ if __name__ == '__main__':
     except Exception as e:
         traceback.print_exc()
     finally:
+        print("Zacnem s shranjevanjem")
         tweet_data = sorted(tweet_data, key=lambda x: x[2], reverse=True)
 
         pogoj = input("Zelis shranit? (y/n): ")
@@ -162,8 +166,6 @@ if __name__ == '__main__':
                 writer.writerows(tweet_data)
                 print("shranjeno")
 
+    sleep(spanje_cas)
     print("konec")
-    try:
-        sleep(1000)
-    finally:
-        driver.close()
+    driver.close()
