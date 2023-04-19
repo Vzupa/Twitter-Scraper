@@ -1,0 +1,54 @@
+CALL PridobiNajnovejsePodatke
+
+Cmd.Open.Open Directory: $'''C:\\Users\\vzupa\\Faks\\OIV\\Twitter-Scraper''' Session=> CmdSession
+Cmd.Write Session: CmdSession Command: $'''python3 Web_scraper.py''' SendEnter: True
+Cmd.WaitForText Session: CmdSession Text: $'''Zacnem s shranjevanjem''' IsRegEx: False IgnoreCase: True Timeout: 0
+Cmd.Write Session: CmdSession Command: $'''y''' SendEnter: True
+Cmd.ReadFromCmdSession.Read Session: CmdSession CmdOutput=> CmdOutput
+Cmd.Close Session: CmdSession
+
+
+CALL PridobiPrviDrugiFile
+@@statistics_Input_Text: '1'
+@@statistics_Action_Submit: '1'
+Display.ShowCustomDialog CardTemplateJson: '''{
+          \"type\": \"AdaptiveCard\",
+          \"version\": \"1.4\",
+          \"id\": \"AdaptiveCard\",
+          \"body\": [
+            {
+              \"type\": \"Input.Text\",
+              \"id\": \"handle\",
+              \"value\": \"${handle_Value}\",
+              \"label\": \"${handle_Label}\"
+            }
+          ],
+          \"actions\": [
+            {
+              \"type\": \"Action.Submit\",
+              \"id\": \"Submit\",
+              \"title\": \"${Submit_Title}\"
+            }
+          ],
+          \"FormTitle\": \"${AdaptiveCard_FormTitle}\"
+        }''' CustomFormData=> CustomFormData ButtonPressed=> ButtonPressed @AdaptiveCard_FormTitle: $'''Handle''' @handle_Label: $'''Izberi zeljen handle''' @handle_Value: $'''BBurazov86962''' @Submit_Title: $'''Ok'''
+Folder.GetFiles Folder: $'''C:\\Users\\vzupa\\Faks\\OIV\\Twitter-Scraper\\csv_output''' FileFilter: $'''%CustomFormData['handle']%*.csv''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+SET Iterator TO 0
+LOOP FOREACH CurrentItem IN Files
+    IF Iterator = 0 THEN
+        File.GetPathPart File: CurrentItem FileName=> ImePrviFile
+    END
+    IF Iterator = 1 THEN
+        File.GetPathPart File: CurrentItem FileName=> ImeDrugiFile
+    END
+    Variables.IncreaseVariable Value: Iterator IncrementValue: 1
+    IF Iterator = 2 THEN
+        EXIT LOOP
+    END
+END
+
+
+
+CALL Primerjaj
+
+
